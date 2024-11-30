@@ -196,6 +196,10 @@ typedef struct {
     float           throttleRecoveryRate;
     float           throttleTrackingRate;
 
+    //anti spike
+    float           lastMotorRPM;
+    timeMs_t        spikeStartTime;
+    bool            inSpike;
 } govData_t;
 
 static FAST_DATA_ZERO_INIT govData_t gov;
@@ -377,7 +381,35 @@ static void govUpdateInputs(void)
     gov.throttleInputLow = (getThrottleStatus() == THROTTLE_LOW);
 
     // Assume motor[0]
-    gov.motorRPM = getMotorRawRPMf(0);
+    // anti spike
+    float lastRPM = gov.motorRPM;
+    float nowRPM = getMotorRawRPMf(0);
+    if (getFullHeadSpeedRatio() > 0.333) {
+        if (gov.inSpike == false) {
+            if (nowRPM > (lastRPM * 1.8) || nowRPM < (lastRPM * 0.5)) {
+                gov.inSpike = true;
+                gov.spikeStartTime = millis();
+            }
+            else {
+                gov.motorRPM = nowRPM;
+            }
+        }
+        else {
+            if (nowRPM > (lastRPM * 1.8) || nowRPM < (lastRPM * 0.5)) {
+                if (millis() - gov.spikeStartTime > 20) {
+                    gov.inSpike = false;
+                    gov.motorRPM = nowRPM;
+                }
+            }
+            else {
+                gov.inSpike = false;
+                gov.motorRPM = nowRPM;
+            }
+        }
+    }
+    else {
+        gov.motorRPM = nowRPM;
+    }
 
     // RPM signal is noisy - filtering is required
     float filteredRPM = filterApply(&gov.motorRPMFilter, gov.motorRPM);
