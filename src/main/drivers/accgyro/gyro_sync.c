@@ -91,7 +91,7 @@ void gyroSetSampleRate(gyroDev_t *gyro)
             break;
 
         case ICM_20649_SPI:
-#if defined(STM32F411xE) || defined(STM32G4)
+#if defined(STM32G4)
             gyroRateKHz = GYRO_RATE_1100_Hz;
             gyroSampleRateHz = 1125;
             accSampleRateHz = 1125;
@@ -105,7 +105,7 @@ void gyroSetSampleRate(gyroDev_t *gyro)
         case ICM_20689_SPI:
         case MPU_9250_SPI:
         case MPU_65xx_SPI:
-#if defined(STM32F411xE) || defined(STM32G4)
+#if defined(STM32G4)
             gyroRateKHz = GYRO_RATE_1_kHz;
             gyroSampleRateHz = 1000;
             accSampleRateHz = 1000;
