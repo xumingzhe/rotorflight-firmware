@@ -78,8 +78,8 @@ void mpu6500GyroInit(gyroDev_t *gyro)
     delay(15);
     busWriteRegister(dev, MPU_RA_ACCEL_CONFIG, accel_range << 3);
     delay(15);
-    busWriteRegister(dev, MPU_RA_CONFIG, mpuGyroDLPF(gyro));
-    delay(15);
+    //busWriteRegister(dev, MPU_RA_CONFIG, mpuGyroDLPF(gyro));
+    //delay(15);
     busWriteRegister(dev, MPU_RA_SMPLRT_DIV, gyro->mpuDividerDrops); // Get Divider Drops
     delay(100);
 
